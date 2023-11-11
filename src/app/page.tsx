@@ -12,7 +12,7 @@ export default function Home() {
 							<div className='w-10 h-10 rounded-full bg-slate-500'></div>
 							<div className='flex flex-col'>
 								<div className='font-medium'>You</div>
-								<div className='mt-1'>Hello, how are you?</div>d
+								<div className='mt-1'>Hello, how are you?</div>
 							</div>
 						</div>
 					</div>
