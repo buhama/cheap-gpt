@@ -70,7 +70,7 @@ const Chat = () => {
 
 					{loading && !response && (
 						<>
-							<div className='flex justify-end items-center space-x-4'>
+							<div className='flex items-center space-x-4'>
 								<div className='space-y-2'>
 									<Skeleton className='h-4 w-[250px]' />
 									<Skeleton className='h-4 w-[200px]' />
@@ -80,12 +80,12 @@ const Chat = () => {
 						</>
 					)}
 					{response && (
-						<div className='flex items-end justify-end space-x-4'>
-							<div className='flex justify-end flex-col w-96'>
-								<div className='font-medium text-right'>ChatGPT</div>
-								<div className='mt-1 text-right'> {response}</div>
+						<div className='flex items-end space-x-4'>
+							<div className='w-10 h-10 rounded-full bg-slate-900'></div>
+							<div className='flex flex-col w-96'>
+								<div className='font-medium'>ChatGPT</div>
+								<div className='mt-1'> {response}</div>
 							</div>
-							<div className='w-10 h-10 rounded-full bg-slate-500'></div>
 						</div>
 					)}
 				</div>
