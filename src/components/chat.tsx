@@ -6,22 +6,30 @@ import { Button } from './ui/button';
 import { getResponse } from '@/lib/completion';
 import { Skeleton } from './ui/skeleton';
 
+
+interface Message {
+	type: 'user' | 'bot';
+	message: string;
+}
+
 const Chat = () => {
-	const [message, setMessage] = useState('');
-	const [response, setResponse] = useState('');
+	const [messages, setMessages] = useState<Message[]>([]);
+	const [currentMessage, setCurrentMessage] = useState<string>('');
+	const [currentResponse, setCurrentResponse] = useState<string>('');
 	const [loading, setLoading] = useState(false);
 
 	const submit = async (e: React.FormEvent<HTMLFormElement>) => {
 		e.preventDefault();
-		setResponse('');
 		setLoading(true);
+		setMessages((prev) => [...prev, { type: 'user', message: currentMessage }]);
+		setCurrentResponse('');
 		const response = await fetch('/api/completion', {
 			method: 'POST',
 			headers: {
 				'Content-Type': 'application/json',
 			},
 			body: JSON.stringify({
-				message,
+				message: currentMessage,
 			}),
 		});
 
@@ -48,45 +56,49 @@ const Chat = () => {
 			const chunkValue = decoder.decode(value);
 			console.log('chunkValue', chunkValue);
 			description += chunkValue;
-			setResponse((prev) => `${prev}${chunkValue}`);
+			setCurrentResponse((prev) => prev + chunkValue);
+			setLoading(false);
 		}
 
-		setLoading(false);
-		setMessage('');
-
+		setCurrentMessage('');
+		setMessages((prev) => [...prev, { type: 'bot', message: description }]);
+		setCurrentResponse('');
 	};
 
 	return (
 		<div className='max-w-xl w-full mb-20'>
 			<div className='flex flex-col bg-white dark:bg-zinc-900'>
 				<div className='flex flex-col h-full justify-end overflow-y-auto p-4 space-y-4'>
-					<div className='flex items-end space-x-4'>
-						<div className='w-10 h-10 rounded-full bg-slate-500'></div>
-						<div className='flex flex-col'>
-							<div className='font-medium'>You</div>
-							<div className='mt-1'>Hello, how are you?</div>
+					{messages.map(({ type, message }, i) => (
+						<div className='flex items-end space-x-4' key={i}>
+							<div className='w-10 h-10 rounded-full bg-slate-900'></div>
+							<div className='flex flex-col w-96'>
+								<div className='font-medium'>
+									{type === 'bot' ? 'Bot' : 'You'}
+								</div>
+								<div className='mt-1'> {message}</div>
+							</div>
 						</div>
-					</div>
-
-					{loading && !response && (
+					))}
+					{currentResponse && (
+						<div className='flex items-end space-x-4'>
+							<div className='w-10 h-10 rounded-full bg-slate-900'></div>
+							<div className='flex flex-col w-96'>
+								<div className='font-medium'>Bot</div>
+								<div className='mt-1'> {currentResponse}</div>
+							</div>
+						</div>
+					)}
+					{loading && (
 						<>
 							<div className='flex items-center space-x-4'>
+								<Skeleton className='h-12 w-12 rounded-full' />
 								<div className='space-y-2'>
 									<Skeleton className='h-4 w-[250px]' />
 									<Skeleton className='h-4 w-[200px]' />
 								</div>
-								<Skeleton className='h-12 w-12 rounded-full' />
 							</div>
 						</>
-					)}
-					{response && (
-						<div className='flex items-end space-x-4'>
-							<div className='w-10 h-10 rounded-full bg-slate-900'></div>
-							<div className='flex flex-col w-96'>
-								<div className='font-medium'>ChatGPT</div>
-								<div className='mt-1'> {response}</div>
-							</div>
-						</div>
 					)}
 				</div>
 				<form
@@ -94,8 +106,8 @@ const Chat = () => {
 					onSubmit={(e) => submit(e)}
 				>
 					<Input
-						value={message}
-						onChange={(e) => setMessage(e.target.value)}
+						value={currentMessage}
+						onChange={(e) => setCurrentMessage(e.target.value)}
 						name='message'
 						className='flex-grow'
 						placeholder='Type a message'
