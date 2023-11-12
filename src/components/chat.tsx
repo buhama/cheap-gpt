@@ -74,6 +74,13 @@ const Chat = () => {
 		setCurrentResponse('');
 	};
 
+	const handleKeyDown = (e: React.KeyboardEvent<HTMLTextAreaElement>) => {
+		if (e.key === 'Enter' && !e.shiftKey) {
+			e.preventDefault();
+			submit(e as any);
+		}
+	};
+
 	return (
 		<div className='max-w-4xl w-full mb-20 overflow-auto max-h-fit'>
 			<div className='flex flex-col bg-white dark:bg-zinc-900'>
@@ -132,6 +139,7 @@ const Chat = () => {
 						onChange={(e) => setCurrentMessage(e.target.value)}
 						name='message'
 						className='flex-grow'
+						onKeyDown={handleKeyDown} // Add the onKeyDown event handler
 						placeholder='Type a message'
 					/>
 					<Button className='ml-2' type='submit'>
