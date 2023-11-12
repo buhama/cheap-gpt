@@ -3,9 +3,7 @@
 import React, { useState } from 'react';
 import { Input } from './ui/input';
 import { Button } from './ui/button';
-import { getResponse } from '@/lib/completion';
 import { Skeleton } from './ui/skeleton';
-
 
 interface Message {
 	type: 'user' | 'bot';
@@ -29,7 +27,8 @@ const Chat = () => {
 				'Content-Type': 'application/json',
 			},
 			body: JSON.stringify({
-				message: currentMessage,
+				messages,
+				currentMessage,
 			}),
 		});
 

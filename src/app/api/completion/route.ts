@@ -1,25 +1,44 @@
 import { OpenAIStream, StreamingTextResponse } from 'ai';
-import { Configuration, OpenAIApi } from 'openai-edge';
+import {
+	ChatCompletionRequestMessageRoleEnum,
+	Configuration,
+	OpenAIApi,
+} from 'openai-edge';
 export const runtime = 'edge';
 
 const apiConfig = new Configuration({
 	apiKey: process.env.OPENAI_API_KEY!,
 });
 
+interface Message {
+	type: 'user' | 'bot';
+	message: string;
+}
+
 const openai = new OpenAIApi(apiConfig);
 
 export async function POST(req: Request) {
 	const reqBody = await req.json();
-	const message = reqBody.message;
-
-	let AIPrompt = 'You help people. ';
-	if (message) {
-		AIPrompt = message;
-	}
-
+	console.log('reqbody', reqBody);
+	const messages: Message[] = reqBody.messages;
+	const currentMessage = reqBody.currentMessage || '';
 	// if (organizer && useOrganizer) {
 	// 	AIPrompt += `The event is organized by an organization called: ${organizer}\n\n`;
 	// }
+
+	const promptMessageObjects = messages.map((message) => {
+		if (message.type === 'user') {
+			return {
+				role: ChatCompletionRequestMessageRoleEnum.User,
+				content: message.message,
+			};
+		} else {
+			return {
+				role: ChatCompletionRequestMessageRoleEnum.Assistant,
+				content: message.message,
+			};
+		}
+	});
 
 	try {
 		const response = await openai.createChatCompletion({
@@ -31,9 +50,10 @@ export async function POST(req: Request) {
 					content:
 						'You are a helpful chatbot that helps people with all sorts of information',
 				},
+				...promptMessageObjects,
 				{
 					role: 'user',
-					content: AIPrompt,
+					content: currentMessage,
 				},
 			],
 		});
