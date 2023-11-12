@@ -4,6 +4,7 @@ import React, { useState } from 'react';
 import { Input } from './ui/input';
 import { Button } from './ui/button';
 import { Skeleton } from './ui/skeleton';
+import Markdown from 'react-markdown';
 
 interface Message {
 	type: 'user' | 'bot';
@@ -65,7 +66,7 @@ const Chat = () => {
 	};
 
 	return (
-		<div className='max-w-4xl w-full mb-20'>
+		<div className='max-w-4xl w-full mb-20 overflow-auto max-h-fit'>
 			<div className='flex flex-col bg-white dark:bg-zinc-900'>
 				<div className='flex flex-col h-full justify-end overflow-y-auto p-4 space-y-4'>
 					{messages.map(({ type, message }, i) => (
@@ -79,7 +80,11 @@ const Chat = () => {
 								<div className='font-medium'>
 									{type === 'bot' ? 'Bot' : 'You'}
 								</div>
-								<div className='mt-1'> {message}</div>
+								{type === 'bot' ? (
+									<Markdown className='mt-1'>{message}</Markdown>
+								) : (
+									<div className='mt-1'>{message}</div>
+								)}
 							</div>
 						</div>
 					))}
@@ -88,7 +93,7 @@ const Chat = () => {
 							<div className='w-10 h-10 rounded-full bg-slate-900'></div>
 							<div className='flex flex-col w-fit'>
 								<div className='font-medium'>Bot</div>
-								<div className='mt-1'> {currentResponse}</div>
+								<Markdown className='mt-1'>{currentResponse}</Markdown>
 							</div>
 						</div>
 					)}

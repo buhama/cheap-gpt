@@ -48,7 +48,7 @@ export async function POST(req: Request) {
 				{
 					role: 'system',
 					content:
-						'You are a helpful chatbot that helps people with all sorts of information',
+						'You are a helpful chatbot that helps people with all sorts of information. Format your message using markdown.',
 				},
 				...promptMessageObjects,
 				{
