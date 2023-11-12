@@ -9,12 +9,12 @@ const apiConfig = new Configuration({
 const openai = new OpenAIApi(apiConfig);
 
 export async function POST(req: Request) {
-	const { req: reqBody } = await req.json();
-	console.log('reqBody', reqBody);
+	const reqBody = await req.json();
+	const message = reqBody.message;
 
 	let AIPrompt = 'You help people. ';
-	if (reqBody?.message) {
-		AIPrompt = reqBody.message;
+	if (message) {
+		AIPrompt = message;
 	}
 
 	// if (organizer && useOrganizer) {
