@@ -14,6 +14,7 @@ const Chat = () => {
 	const submit = async (e: React.FormEvent<HTMLFormElement>) => {
 		e.preventDefault();
 		setMessage('');
+        setResponse('');
 		setLoading(true);
 		const response = await fetch('/api/completion', {
 			method: 'POST',
