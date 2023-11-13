@@ -108,7 +108,7 @@ const Chat = () => {
 		<div className='max-w-4xl w-full mb-20 overflow-auto max-h-fit'>
 			<div className='flex flex-col bg-white dark:bg-zinc-900'>
 				<div
-					className='flex flex-col overflow-y-auto p-4 space-y-4 h-[calc(100vh_-_192px)]'
+					className='flex flex-col overflow-y-auto p-4 space-y-4 h-[calc(100vh_-_292px)]'
 					ref={containerRef}
 				>
 					{messages.map(({ type, message }, i) => (
