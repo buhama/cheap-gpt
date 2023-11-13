@@ -11,6 +11,7 @@ import { Image } from 'lucide-react';
 interface Message {
 	type: 'user' | 'bot';
 	message: string;
+	base64Image?: string;
 }
 
 const Chat = () => {
@@ -32,7 +33,10 @@ const Chat = () => {
 	const submit = async (e: React.FormEvent<HTMLFormElement>) => {
 		e.preventDefault();
 		setLoading(true);
-		setMessages((prev) => [...prev, { type: 'user', message: currentMessage }]);
+		setMessages((prev) => [
+			...prev,
+			{ type: 'user', message: currentMessage, base64Image: imageBase64 },
+		]);
 		setCurrentResponse('');
 		const response = await fetch('/api/completion', {
 			method: 'POST',
@@ -74,6 +78,7 @@ const Chat = () => {
 		}
 
 		setCurrentMessage('');
+		setImageBase64('');
 		setMessages((prev) => [...prev, { type: 'bot', message: description }]);
 		setCurrentResponse('');
 	};
@@ -111,7 +116,7 @@ const Chat = () => {
 					className='flex flex-col overflow-y-auto p-4 space-y-4 h-[calc(100vh_-_292px)]'
 					ref={containerRef}
 				>
-					{messages.map(({ type, message }, i) => (
+					{messages.map(({ type, message, base64Image }, i) => (
 						<div className='flex items-end space-x-4' key={i}>
 							<div
 								className={`w-10 h-10 rounded-full ${
@@ -122,7 +127,14 @@ const Chat = () => {
 								<div className='font-medium'>
 									{type === 'bot' ? 'Bot' : 'You'}
 								</div>
-
+								{base64Image && (
+									<div className='flex w-36 rounded-xl mb-3 relative'>
+										<img
+											src={base64Image}
+											className='max-h-[600px] max-w-full rounded-lg'
+										/>
+									</div>
+								)}
 								<Markdown className='mt-1 flex flex-col gap-y-4'>
 									{message}
 								</Markdown>
