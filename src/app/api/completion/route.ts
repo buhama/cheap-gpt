@@ -71,7 +71,7 @@ export async function POST(req: Request) {
 				},
 			],
 			...(imageBase64 && {
-				max_tokens: 600,
+				max_tokens: 1200,
 			}),
 		});
 
