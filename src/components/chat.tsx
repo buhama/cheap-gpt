@@ -6,6 +6,7 @@ import { Button } from './ui/button';
 import { Skeleton } from './ui/skeleton';
 import Markdown from 'react-markdown';
 import { Textarea } from './ui/textarea';
+import { Image } from 'lucide-react';
 
 interface Message {
 	type: 'user' | 'bot';
@@ -17,8 +18,10 @@ const Chat = () => {
 	const [currentMessage, setCurrentMessage] = useState<string>('');
 	const [currentResponse, setCurrentResponse] = useState<string>('');
 	const [loading, setLoading] = useState(false);
+	const [imageBase64, setImageBase64] = useState('');
 
 	const containerRef = useRef<HTMLDivElement | null>(null);
+	const fileInputRef = useRef(null);
 
 	useEffect(() => {
 		if (containerRef.current) {
@@ -39,6 +42,7 @@ const Chat = () => {
 			body: JSON.stringify({
 				messages,
 				currentMessage,
+				imageBase64,
 			}),
 		});
 
@@ -78,6 +82,25 @@ const Chat = () => {
 		if (e.key === 'Enter' && !e.shiftKey) {
 			e.preventDefault();
 			submit(e as any);
+		}
+	};
+
+	const handleFileChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+		if (!e.target.files) return;
+
+		const file = e.target.files[0];
+		console.log('file', file);
+		if (file) {
+			const reader = new FileReader();
+			reader.onloadend = () => {
+				if (typeof reader.result === 'string') {
+					setImageBase64(reader.result);
+					// alert('File uploaded');
+				} else {
+					alert('Error');
+				}
+			};
+			reader.readAsDataURL(file);
 		}
 	};
 
@@ -130,22 +153,52 @@ const Chat = () => {
 						</>
 					)}
 				</div>
-				<form
-					className='flex items-center p-4 border-t dark:border-zinc-700'
-					onSubmit={(e) => submit(e)}
-				>
-					<Textarea
-						value={currentMessage}
-						onChange={(e) => setCurrentMessage(e.target.value)}
-						name='message'
-						className='flex-grow'
-						onKeyDown={handleKeyDown} // Add the onKeyDown event handler
-						placeholder='Type a message'
-					/>
-					<Button className='ml-2' type='submit'>
-						Send
-					</Button>
-				</form>
+				<div className='p-4 border-t'>
+					{imageBase64 && (
+						<div className='flex w-20 rounded-xl mb-3 relative'>
+							<img
+								src={imageBase64}
+								className='max-h-[300px] max-w-full rounded-lg'
+							/>
+							<button
+								onClick={() => setImageBase64('')}
+								className='absolute top-0 right-0 bg-gray-600 text-white rounded-full p-1 m-1'
+								style={{ cursor: 'pointer' }}
+							>
+								X
+							</button>
+						</div>
+					)}
+					<form
+						className='flex items-center p-4 dark:border-zinc-700'
+						onSubmit={(e) => submit(e)}
+					>
+						<Image
+							className='mr-4 cursor-pointer'
+							onClick={() =>
+								fileInputRef.current && (fileInputRef.current as any).click()
+							}
+						/>{' '}
+						<input
+							type='file'
+							accept='image/*'
+							style={{ display: 'none' }}
+							ref={fileInputRef}
+							onChange={(e) => handleFileChange(e)}
+						/>
+						<Textarea
+							value={currentMessage}
+							onChange={(e) => setCurrentMessage(e.target.value)}
+							name='message'
+							className='flex-grow'
+							onKeyDown={handleKeyDown} // Add the onKeyDown event handler
+							placeholder='Type a message'
+						/>
+						<Button className='ml-2' type='submit'>
+							Send
+						</Button>
+					</form>
+				</div>
 			</div>
 		</div>
 	);

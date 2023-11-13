@@ -22,6 +22,7 @@ export async function POST(req: Request) {
 	console.log('reqbody', reqBody);
 	const messages: Message[] = reqBody.messages;
 	const currentMessage = reqBody.currentMessage || '';
+	const imageBase64 = reqBody.imageBase64 || '';
 	// if (organizer && useOrganizer) {
 	// 	AIPrompt += `The event is organized by an organization called: ${organizer}\n\n`;
 	// }
@@ -40,9 +41,22 @@ export async function POST(req: Request) {
 		}
 	});
 
+	let mainMessage = currentMessage;
+	if (imageBase64) {
+		mainMessage = [
+			{ type: 'text', text: currentMessage },
+			{
+				type: 'image_url',
+				image_url: {
+					url: imageBase64,
+				},
+			},
+		];
+	}
+
 	try {
 		const response = await openai.createChatCompletion({
-			model: 'gpt-4-1106-preview',
+			model: imageBase64 ? 'gpt-4-vision-preview' : 'gpt-4-1106-preview',
 			stream: true,
 			messages: [
 				{
@@ -53,9 +67,12 @@ export async function POST(req: Request) {
 				...promptMessageObjects,
 				{
 					role: 'user',
-					content: currentMessage,
+					content: mainMessage,
 				},
 			],
+			...(imageBase64 && {
+				max_tokens: 600,
+			}),
 		});
 
 		const stream = OpenAIStream(response);
